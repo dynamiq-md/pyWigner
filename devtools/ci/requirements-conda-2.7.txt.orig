@@ -1,0 +1,20 @@
+numpy
+scipy
+pyyaml
+pip
+nose
+mdtraj
+openmm
+ambermini
+netcdf4
+msmbuilder
+openmmtools
+ipython
+ipython-notebook
+matplotlib
+svgwrite
+<<<<<<< HEAD
+psutil
+=======
+networkx
+>>>>>>> upstream/master
