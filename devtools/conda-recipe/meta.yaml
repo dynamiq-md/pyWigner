@@ -1,6 +1,6 @@
 package:
-  name: openpathsampling-dev
-  version: !!str 0.0.2
+  name: pywigner-dev
+  version: !!str 0.0.1
 
 build:
   preserve_egg_dir: True
@@ -23,6 +23,7 @@ requirements:
     - mdtraj
     - svgwrite
     - networkx
+    - openpathsampling-dev
 
   run:
     - python
@@ -39,7 +40,8 @@ requirements:
     - mdtraj
     - svgwrite
     - networkx
+    - openpathsampling-dev
 
 about:
-  home: https://github.com/choderalab/openpathsampling
+  home: https://github.com/dwhswenson/pyWigner
   license: GNU Lesser General Public License v2 or later (LGPLv2+)
