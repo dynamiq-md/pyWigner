@@ -41,8 +41,8 @@ class testGaussianWavePacket(OperatorTester):
               for (vel, mass) in zip(snap0.velocities, snap0.topology.masses)]
         self.op = GaussianWavepacket(
             x0=snap0.coordinates,
-            p0=p0,
-            gamma=[[4.0, 4.0, 4.0], [2.0, 2.0, 2.0]]
+            p0=np.array(p0),
+            gamma=np.array([[4.0, 4.0, 4.0], [2.0, 2.0, 2.0]])
         )
     
     def test_sample_initial_conditions(self):
