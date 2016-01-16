@@ -23,7 +23,7 @@ class Operator(paths.OPSNamed):
         raise NotImplementedError("No Wigner function for operator")
 
 
-class GaussianWavepacket(Operator):
+class CoherentProjection(Operator):
     def __init__(self, x0, p0, gamma, excitons=0):
         self.x0 = x0.ravel()
         self.p0 = p0.ravel()
@@ -34,6 +34,7 @@ class GaussianWavepacket(Operator):
         if list(self.excitons) == [0]*self.n_dofs:
             self.sampling_gamma = self.gamma
         else:
+            # TODO: set up things beyond the ground state
             pass
 
     def sample_initial_conditions(self, previous_trajectory):
@@ -51,6 +52,6 @@ class GaussianWavepacket(Operator):
     def __call__(self, snapshot):
         pass
 
-    def excite(dof, excitons=1):
+    def excite(self, dof, excitons=1):
         pass
 
