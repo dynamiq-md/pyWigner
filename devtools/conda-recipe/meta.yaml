@@ -1,47 +1,28 @@
 package:
-  name: pywigner-dev
-  version: !!str 0.0.1
+    name: pywigner-dev
+    version: "0.0.1"
 
-build:
-  preserve_egg_dir: True
-  number: 0
+source:
+    path: ../../
 
 requirements:
-  build:
-    - python
-    - numpy
-    - setuptools
-    - numpy
-    - scipy
-    - setuptools
-    - netcdf4
-    - openmm
-    - openmmtools
-    - pymbar
-    - docopt
-    - jinja2
-    - mdtraj
-    - svgwrite
-    - networkx
-    - openpathsampling-dev
+    build:
+        - python
+        - setuptools
+        - numpy
 
-  run:
-    - python
-    - pandas
-    - numpy
-    - scipy
-    - netcdf4
-    - openmm
-    - openmmtools
-    - pymbar
-    - docopt
-    - pyyaml
-    - jinja2
-    - mdtraj
-    - svgwrite
-    - networkx
-    - openpathsampling-dev
+    run:
+        - python
+        - numpy
+        - scipy
+        - pandas
+        - openpathsampling-dev
 
-about:
-  home: https://github.com/dwhswenson/pyWigner
-  license: GNU Lesser General Public License v2 or later (LGPLv2+)
+
+test:
+    requires:
+        - nose
+        - python-coveralls
+
+    imports:
+        - pywigner
