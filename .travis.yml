@@ -1,0 +1,24 @@
+language: python
+
+python:
+    - "2.7"
+
+install:
+    - deactivate
+    - source devtools/ci/install_conda.sh
+    # TODO: need to download and build dynamiq_engine in test environment
+    - export PYTHONUNBUFFERED=true
+
+script:
+    - conda install --yes conda-build
+    - conda build devtools/conda-recipe
+    
+    - source activate _test
+    - nosetests -v --with-coverage
+
+after_success:
+    - coveralls
+
+env:
+    matrix:
+        - python=2.7 CONDA_PY=27 CONDA_NPY=110
