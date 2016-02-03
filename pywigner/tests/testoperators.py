@@ -1,5 +1,6 @@
 import openpathsampling as paths
 import pywigner as lsc
+import numpy as np
 from pywigner.operators import *
 
 
@@ -28,7 +29,7 @@ class testOperator(OperatorTester):
     def test_call(self):
         self.op.sample_initial_conditions(self.previous_trajectory[0])
 
-class testGaussianWavePacket(OperatorTester):
+class testCoherentProjection(OperatorTester):
     def setup(self):
         topology = paths.ToyTopology(n_atoms=2, n_spatial=3, 
                                      masses=np.array([1.5, 2.5]), pes=None)
@@ -39,7 +40,7 @@ class testGaussianWavePacket(OperatorTester):
         )
         p0 = [vel * mass
               for (vel, mass) in zip(snap0.velocities, snap0.topology.masses)]
-        self.op = GaussianWavepacket(
+        self.op = CoherentProjection(
             x0=snap0.coordinates,
             p0=np.array(p0),
             gamma=np.array([[4.0, 4.0, 4.0], [2.0, 2.0, 2.0]])
@@ -48,7 +49,7 @@ class testGaussianWavePacket(OperatorTester):
     def test_sample_initial_conditions(self):
         # not much we can do here except check that the resulting snapshot
         # exists and has the right number of attributes
-        snap = self.op.sample_initial_conditions(self.previous_trajectory)
+        #snap = self.op.sample_initial_conditions(self.previous_trajectory)
         raise SkipTest
 
     def test_correction(self):
