@@ -10,8 +10,9 @@ def clean_ravel(arr, n_dofs):
 
 class GaussianFunction(object):
     def __init__(self, x0, alpha):
-        self.x0 = x0
-        self.alpha = alpha
+        self.x0 = np.array(x0)
+        self.alpha = np.array(alpha)
+        assert(self.x0.shape == self.alpha.shape)
         self._internal = np.zeros_like(self.alpha)
 
     def draw_sample(self):
@@ -21,8 +22,10 @@ class GaussianFunction(object):
         return sample
 
     def set_array_to_drawn_sample(self, array):
-        # TODO: fill the array with proper samples drawn from a Gaussian
-        pass
+        # TODO: I think this can be significantly sped up for large systems
+        n_dofs = len(self.alpha)
+        for i in range(n_dofs):
+            array[i] = np.random.normal(loc=self.x0[i], scale=self.alpha[i])
 
     def __call__(self):
         numpy.sub(x, x0, self._internal) # dx

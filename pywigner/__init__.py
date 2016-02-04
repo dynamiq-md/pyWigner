@@ -1,3 +1,3 @@
 from operators import (
-    Operator, GaussianWavepacket
+    Operator
 )
