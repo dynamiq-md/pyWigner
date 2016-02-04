@@ -45,6 +45,9 @@ class testCoherentProjection(OperatorTester):
             p0=np.array(p0),
             gamma=np.array([[4.0, 4.0, 4.0], [2.0, 2.0, 2.0]])
         )
+
+    def test_initialization(self):
+        raise SkipTest
     
     def test_sample_initial_conditions(self):
         # not much we can do here except check that the resulting snapshot
