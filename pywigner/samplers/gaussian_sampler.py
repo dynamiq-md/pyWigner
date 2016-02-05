@@ -36,22 +36,32 @@ class GaussianInitialConditions(InitialConditionSampler):
         # TODO: this can probably be sped up, but also probably isn't a
         # bottleneck in the overall calculation
         x0 = self.coordinate_gaussian.draw_sample()
-        p0 = self.momenta_gaussian.draw_sample()
+        p0 = self.momentum_gaussian.draw_sample()
         if self.coordinate_dofs is None:
             np.copyto(snapshot.coordinates, x0)
         else:
             for (d, x) in zip(self.coordinate_dofs, x0):
                 snapshot.coordinates[d] = x
         if self.momentum_dofs is None:
-            np.copyto(snapshot.momentum, p0)
+            np.copyto(snapshot.momenta, p0)
         else:
             for (d, p) in zip(self.coordinate_dofs, p0):
                 snapshot.momenta[d] = x
 
 
     def __call__(self, snapshot):
-        return (self.coordinate_gaussian(snapshot.coordinates)
-                * self.momentum_gaussian(snapshot.momenta))
+        if self.coordinate_dofs is None:
+            x_vals = snapshot.coordinates
+        else:
+            x_vals = [snapshot.coordinates[i] for i in self.coordinate_dofs]
+
+        if self.momentum_dofs is None:
+            p_vals = snapshot.momenta
+        else:
+            p_vals = [snapshot.momenta[i] for i in self.momentum_dofs]
+
+        return (self.coordinate_gaussian(x_vals) 
+                * self.momentum_gaussian(p_vals))
 
 
 class MMSTElectronicGaussianInitialConditions(GaussianInitialConditions):
