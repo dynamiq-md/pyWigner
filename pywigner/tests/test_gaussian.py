@@ -6,6 +6,10 @@ class testGaussianFunction(object):
     def setup(self):
         self.gaussian = GaussianFunction(x0=[0.0, 1.0], alpha=[1.0, 2.0])
 
+    @raises(AssertionError)
+    def test_bad_setup(self):
+        gaussian = GaussianFunction(x0=[1.0], alpha=[1.0, 2.0])
+
     def test_gaussian(self):
         raise SkipTest
 
