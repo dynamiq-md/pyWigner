@@ -45,8 +45,8 @@ class GaussianInitialConditions(InitialConditionSampler):
         if self.momentum_dofs is None:
             np.copyto(snapshot.momenta, p0)
         else:
-            for (d, p) in zip(self.coordinate_dofs, p0):
-                snapshot.momenta[d] = x
+            for (d, p) in zip(self.momentum_dofs, p0):
+                snapshot.momenta[d] = p
 
 
     def __call__(self, snapshot):
