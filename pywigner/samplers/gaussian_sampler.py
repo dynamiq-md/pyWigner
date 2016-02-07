@@ -17,6 +17,25 @@ class GaussianInitialConditions(InitialConditionSampler):
         self.coordinate_gaussian = lsc.tools.GaussianFunction(x0, alpha_x)
         self.momentum_gaussian = lsc.tools.GaussianFunction(p0, alpha_p)
 
+    @staticmethod
+    def _fill_feature(snapshot_array, sampler, dofs):
+        # TODO: this can probably be sped up, but also probably isn't a
+        # bottleneck in the overall calculation
+        vals = sampler.draw_sample()
+        if dofs is None:
+            np.copyto(snapshot_array, vals)
+        else:
+            for (d, v) in zip(dofs, vals):
+                snapshot_array[d] = v
+
+    @staticmethod
+    def _get_feature(snapshot_array, dofs):
+        if dofs is None:
+            return snapshot_array
+        else:
+            return [snapshot_array[i] for i in dofs]
+
+
 
     def generate_initial_snapshot(self, previous_snapshot):
         snapshot = previous_snapshot.copy() 
@@ -32,34 +51,18 @@ class GaussianInitialConditions(InitialConditionSampler):
         # because this can be reused by other functions, e.g., so that only
         # part of the total snapshot if filled by the Gaussian sampling (if
         # we want to fix one variable, for example)
-        #
-        # TODO: this can probably be sped up, but also probably isn't a
-        # bottleneck in the overall calculation
-        x0 = self.coordinate_gaussian.draw_sample()
-        p0 = self.momentum_gaussian.draw_sample()
-        if self.coordinate_dofs is None:
-            np.copyto(snapshot.coordinates, x0)
-        else:
-            for (d, x) in zip(self.coordinate_dofs, x0):
-                snapshot.coordinates[d] = x
-        if self.momentum_dofs is None:
-            np.copyto(snapshot.momenta, p0)
-        else:
-            for (d, p) in zip(self.momentum_dofs, p0):
-                snapshot.momenta[d] = p
-
+        self._fill_feature(snapshot_array=snapshot.coordinates,
+                           sampler=self.coordinate_gaussian,
+                           dofs=self.coordinate_dofs)
+        self._fill_feature(snapshot_array=snapshot.momenta,
+                           sampler=self.momentum_gaussian,
+                           dofs=self.momentum_dofs)
 
     def __call__(self, snapshot):
-        if self.coordinate_dofs is None:
-            x_vals = snapshot.coordinates
-        else:
-            x_vals = [snapshot.coordinates[i] for i in self.coordinate_dofs]
-
-        if self.momentum_dofs is None:
-            p_vals = snapshot.momenta
-        else:
-            p_vals = [snapshot.momenta[i] for i in self.momentum_dofs]
-
+        x_vals = self._get_feature(snapshot.coordinates,
+                                   self.coordinate_dofs)
+        p_vals = self._get_feature(snapshot.momenta,
+                                   self.momentum_dofs)
         return (self.coordinate_gaussian(x_vals) 
                 * self.momentum_gaussian(p_vals))
 
@@ -72,10 +75,32 @@ class MMSTElectronicGaussianInitialConditions(GaussianInitialConditions):
             alpha_x=np.array([1.0]*n_dofs), alpha_p=np.array([1.0]*n_dofs)
         )
 
-    def generate_trial_trajectory(self, previous_trajectory):
+    def generate_initial_snapshot(self, previous_snapshot):
+        snapshot = previous_snapshot.copy() 
+        # this might be a shallow copy, so deepen over the features:
+        snapshot.electronic_momenta = snapshot.electronic_momenta.copy()
+        snapshot.electronic_coordinates = snapshot.electronic_coordinates.copy()
+        self.fill_initial_snapshot(snapshot, previous_snapshot)
+        return snapshot
+
+
+    def fill_initial_snapshot(self, previous_snapshot):
+        x0 = self.coordinate_gaussian.draw_sample()
+        p0 = self.momentum_gaussian.draw_sample()
         pass
 
-    def __call__(self, snapshot):
-        return (self.coordinate_gaussian(snapshot.electronic_coordinates)
-                * self.momentum_gaussian(snapshot.electronic_momenta))
 
+    def _get_xvals_pvals(self, snapshot):
+        if self.coordinate_dofs is None:
+            x_vals = snapshot.electronic_coordinates
+        else:
+            x_vals = [snapshot.electronic_coordinates[i] 
+                      for i in self.coordinate_dofs]
+
+        if self.momentum_dofs is None:
+            p_vals = snapshot.electronic_momenta
+        else:
+            p_vals = [snapshot.electronic_momenta[i] 
+                      for i in self.momentum_dofs]
+        
+        return (x_vals, p_vals)
