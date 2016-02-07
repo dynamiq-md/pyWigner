@@ -85,22 +85,18 @@ class MMSTElectronicGaussianInitialConditions(GaussianInitialConditions):
 
 
     def fill_initial_snapshot(self, previous_snapshot):
-        x0 = self.coordinate_gaussian.draw_sample()
-        p0 = self.momentum_gaussian.draw_sample()
-        pass
+        self._fill_feature(snapshot_array=snapshot.electronic_coordinates,
+                           sampler=self.coordinate_gaussian,
+                           dofs=self.coordinate_dofs)
+        self._fill_feature(snapshot_array=snapshot.electronic_momenta,
+                           sampler=self.momentum_gaussian,
+                           dofs=self.momentum_dofs)
 
 
-    def _get_xvals_pvals(self, snapshot):
-        if self.coordinate_dofs is None:
-            x_vals = snapshot.electronic_coordinates
-        else:
-            x_vals = [snapshot.electronic_coordinates[i] 
-                      for i in self.coordinate_dofs]
-
-        if self.momentum_dofs is None:
-            p_vals = snapshot.electronic_momenta
-        else:
-            p_vals = [snapshot.electronic_momenta[i] 
-                      for i in self.momentum_dofs]
-        
-        return (x_vals, p_vals)
+    def __call__(self, snapshot):
+        x_vals = self._get_feature(snapshot.electronic_coordinates,
+                                   self.coordinate_dofs)
+        p_vals = self._get_feature(snapshot.electronic_momenta,
+                                   self.momentum_dofs)
+        return (self.coordinate_gaussian(x_vals) 
+                * self.momentum_gaussian(p_vals))
