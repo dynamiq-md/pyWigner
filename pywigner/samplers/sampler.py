@@ -1,6 +1,7 @@
 import pywigner as lsc
 
 class InitialConditionSampler(object):
+    __features__ = []
 
     global_engine = None
 
@@ -38,11 +39,19 @@ class InitialConditionSampler(object):
         raise NotImplementedError("Abstract InitialConditionSampler")
         pass
 
-class OrthogonalProductInitialConditions(InitialConditionSampler):
+class OrthogonalInitialConditions(InitialConditionSampler):
     def __init__(self, samplers):
+        self.samplers = samplers
+        self.__features__ = list(set(sum(
+            [s.__features__ for s in self.samplers], []
+        )))
+        # TODO: add tests to make sure there's no problems of overlap
         pass
 
-    def generate_trial_trajectory(self, previous_trajectory):
+    def generate_initial_snapshot(self, previous_snapshot):
+        pass
+
+    def fill_initial_snapshot(self, snapshot, previous_snapshot):
         pass
 
     def __call__(self, snapshot):

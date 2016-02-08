@@ -3,8 +3,13 @@ import numpy as np
 # dodge circular import issues
 from pywigner.samplers import InitialConditionSampler
 
+# both of these are for the features
+import openpathsampling as paths
+import dynamiq_engine.features as features
+
 
 class GaussianInitialConditions(InitialConditionSampler):
+    __features__ = [paths.features.coordinates, features.momenta]
     def __init__(self, x0, p0, alpha_x, alpha_p, coordinate_dofs=None,
                  momentum_dofs=None):
         self.x0 = x0
@@ -13,6 +18,13 @@ class GaussianInitialConditions(InitialConditionSampler):
         self.alpha_p = alpha_p
         self.coordinate_dofs = coordinate_dofs
         self.momentum_dofs = momentum_dofs
+
+        # the following also works for any extended momentum samplers; more
+        # complicated combinations should be done without inheritance
+        self.feature_dofs = {
+            self.__features__[0] : coordinate_dofs,
+            self.__features__[1] : momentum_dofs
+        }
 
         self.coordinate_gaussian = lsc.tools.GaussianFunction(x0, alpha_x)
         self.momentum_gaussian = lsc.tools.GaussianFunction(p0, alpha_p)
@@ -67,6 +79,8 @@ class GaussianInitialConditions(InitialConditionSampler):
 
 
 class MMSTElectronicGaussianInitialConditions(GaussianInitialConditions):
+    __features__ = [features.electronic_coordinates,
+                    features.electronic_momenta]
     @classmethod
     def with_n_dofs(cls, n_dofs):
         return cls(
