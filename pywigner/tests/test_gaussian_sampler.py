@@ -107,3 +107,54 @@ class testGaussianInitialConditions(object):
         assert_equal(snap.momenta[0], self.snap2_0x0.momenta[0])
         assert_not_equal(snap.momenta[1], self.snap2_0x0.momenta[1])
 
+class testMMSTElectronicGaussianInitialConditions(object):
+    def setup(self):
+        mmst_matrix = dynq.NonadiabaticMatrix([[2.0, 1.0], [1.0, 3.0]])
+        mmst = dynq.potentials.MMSTHamiltonian(mmst_matrix)
+        topology = dynq.Topology(masses=np.array([]), potential=mmst)
+        self.snap0x0 = dynq.MMSTSnapshot(
+            coordinates=np.array([]), momenta=np.array([]),
+            electronic_coordinates=np.array([0.0, 0.0]),
+            electronic_momenta=np.array([0.0, 0.0]),
+            topology=topology
+        )
+        self.snap0x5 = dynq.MMSTSnapshot(
+            coordinates=np.array([]), momenta=np.array([]),
+            electronic_coordinates=np.array([0.5, 0.0]),
+            electronic_momenta=np.array([0.5, 0.0]),
+            topology=topology
+        )
+        self.snap1x0 = dynq.MMSTSnapshot(
+            coordinates=np.array([]), momenta=np.array([]),
+            electronic_coordinates=np.array([1.0, 0.0]),
+            electronic_momenta=np.array([1.0, 0.0]),
+            topology=topology
+        )
+        self.snap1x5 = dynq.MMSTSnapshot(
+            coordinates=np.array([]), momenta=np.array([]),
+            electronic_coordinates=np.array([1.5, 0.0]),
+            electronic_momenta=np.array([1.5, 0.0]),
+            topology=topology
+        )
+
+    def test_sampler(self):
+        sampler = MMSTElectronicGaussianInitialConditions.with_n_dofs(2)
+        norm = 0.101321183642338
+        tests = {
+            self.snap0x0 : norm, 
+            # 2.0 bc 2 dofs contribute
+            self.snap0x5 : norm*np.exp(-2.0*(0.5**2)),
+            self.snap1x0 : norm*np.exp(-2.0*(1.0**2)),
+            self.snap1x5 : norm*np.exp(-2.0*(1.5**2))
+        }
+        check_function(sampler, tests)
+
+        snap = sampler.generate_initial_snapshot(self.snap0x0)
+        #assert_not_equal(snap, self.snap0x0)
+        #assert_equal(snap.topology, self.snap0x0.topology)
+        #for d in range(2):
+            #assert_not_equal(snap.electronic_coordinates[d],
+                             #self.snap0x0.electronic_coordinates[d])
+            #assert_not_equal(snap.electronic_momenta[d],
+                             #self.snap0x0.electronic_momenta[d])
+

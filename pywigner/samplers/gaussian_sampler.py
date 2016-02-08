@@ -36,7 +36,6 @@ class GaussianInitialConditions(InitialConditionSampler):
             return [snapshot_array[i] for i in dofs]
 
 
-
     def generate_initial_snapshot(self, previous_snapshot):
         snapshot = previous_snapshot.copy() 
         # this might be a shallow copy, so deepen over the features:
@@ -70,7 +69,7 @@ class GaussianInitialConditions(InitialConditionSampler):
 class MMSTElectronicGaussianInitialConditions(GaussianInitialConditions):
     @classmethod
     def with_n_dofs(cls, n_dofs):
-        return MMSTElectronicGaussianSampler(
+        return cls(
             x0=np.array([0.0]*n_dofs), p0=np.array([0.0]*n_dofs), 
             alpha_x=np.array([1.0]*n_dofs), alpha_p=np.array([1.0]*n_dofs)
         )
@@ -84,7 +83,7 @@ class MMSTElectronicGaussianInitialConditions(GaussianInitialConditions):
         return snapshot
 
 
-    def fill_initial_snapshot(self, previous_snapshot):
+    def fill_initial_snapshot(self, snapshot, previous_snapshot):
         self._fill_feature(snapshot_array=snapshot.electronic_coordinates,
                            sampler=self.coordinate_gaussian,
                            dofs=self.coordinate_dofs)
