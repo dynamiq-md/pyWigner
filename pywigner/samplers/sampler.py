@@ -60,12 +60,20 @@ class OrthogonalInitialConditions(InitialConditionSampler):
             self.feature_dofs[f] = all_dofs
 
 
-
     def generate_initial_snapshot(self, previous_snapshot):
-        pass
+        snapshot = previous_snapshot.copy()
+        # TODO: add correct copying of all features in here
+        self.fill_initial_snapshot(snapshot, previous_snapshot)
+        return snapshot
+
 
     def fill_initial_snapshot(self, snapshot, previous_snapshot):
-        pass
+        for s in self.samplers:
+            s.fill_initial_snapshot(snapshot, previous_snapshot)
+
 
     def __call__(self, snapshot):
-        pass
+        result = 1.0
+        for s in self.samplers:
+            result *= s(snapshot)
+        return result
