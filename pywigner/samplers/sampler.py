@@ -45,8 +45,21 @@ class OrthogonalInitialConditions(InitialConditionSampler):
         self.__features__ = list(set(sum(
             [s.__features__ for s in self.samplers], []
         )))
-        # TODO: add tests to make sure there's no problems of overlap
-        pass
+
+        feature_samplers = {f : [s for s in samplers if f in s.__features__]
+                            for f in self.__features__}
+        self.feature_dofs = {}
+        for f in feature_samplers:
+            if len(feature_samplers[f]) > 1:
+                all_dofs = sum(list(feature_samplers[f].feature_dofs), [])
+                if None in all_dofs or len(all_dofs) != len(set(all_dofs)):
+                    raise RuntimeError("Some dofs repeated for feature "+
+                                       str(f))
+            else:
+                all_dofs = feature_samplers[f].feature_dofs
+            self.feature_dofs[f] = all_dofs
+
+
 
     def generate_initial_snapshot(self, previous_snapshot):
         pass

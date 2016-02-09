@@ -37,6 +37,22 @@ class testGaussianInitialConditions(object):
                                        momenta=np.array([0.0, 1.5]),
                                        topology=topol_2)
 
+    def test_features(self):
+        from openpathsampling.features import coordinates as f_coordinates
+        from dynamiq_engine.features import momenta as f_momenta
+        sampler = GaussianInitialConditions(x0=[0.0], alpha_x=[1.0],
+                                            p0=[1.0], alpha_p=[2.0])
+        assert_equal(sampler.__features__, [f_coordinates, f_momenta])
+        assert_equal(sampler.feature_dofs, {f_coordinates : None,
+                                            f_momenta : None})
+        sampler2 = GaussianInitialConditions(x0=[], alpha_x=[],
+                                             p0=[1.0], alpha_p=[2.0],
+                                             coordinate_dofs=[],
+                                             momentum_dofs=[1])
+        assert_equal(sampler2.__features__, [f_coordinates, f_momenta])
+        assert_equal(sampler2.feature_dofs, {f_coordinates : [],
+                                             f_momenta : [1]})
+
 
     def test_sampler(self):
         # tests a sampler using all DOFs -- includes tests of all parts
@@ -158,3 +174,20 @@ class testMMSTElectronicGaussianInitialConditions(object):
             #assert_not_equal(snap.electronic_momenta[d],
                              #self.snap0x0.electronic_momenta[d])
 
+    def test_features(self):
+        from openpathsampling.features import coordinates as f_coordinates
+        from dynamiq_engine.features import momenta as f_momenta
+        from dynamiq_engine.features import electronic_coordinates \
+                as f_e_coordinates
+        from dynamiq_engine.features import electronic_momenta \
+                as f_e_momenta
+
+        sampler = MMSTElectronicGaussianInitialConditions.with_n_dofs(2)
+        assert_equal(sampler.__features__, [f_e_coordinates, f_e_momenta])
+        assert_equal(sampler.feature_dofs, {f_e_coordinates : None,
+                                            f_e_momenta : None})
+        sampler2 = GaussianInitialConditions(x0=[0.0], alpha_x=[1.0],
+                                             p0=[1.0], alpha_p=[2.0])
+        assert_equal(sampler.__features__, [f_e_coordinates, f_e_momenta])
+        assert_equal(sampler2.__features__, [f_coordinates, f_momenta])
+        

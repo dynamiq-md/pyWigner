@@ -1,5 +1,5 @@
 from sampler import (
-    InitialConditionSampler, OrthogonalProductInitialConditions
+    InitialConditionSampler, OrthogonalInitialConditions
 )
 
 from gaussian_sampler import (GaussianInitialConditions,
