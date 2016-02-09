@@ -166,13 +166,13 @@ class testMMSTElectronicGaussianInitialConditions(object):
         check_function(sampler, tests)
 
         snap = sampler.generate_initial_snapshot(self.snap0x0)
-        #assert_not_equal(snap, self.snap0x0)
-        #assert_equal(snap.topology, self.snap0x0.topology)
-        #for d in range(2):
-            #assert_not_equal(snap.electronic_coordinates[d],
-                             #self.snap0x0.electronic_coordinates[d])
-            #assert_not_equal(snap.electronic_momenta[d],
-                             #self.snap0x0.electronic_momenta[d])
+        assert_not_equal(snap, self.snap0x0)
+        assert_equal(snap.topology, self.snap0x0.topology)
+        for d in range(2):
+            assert_not_equal(snap.electronic_coordinates[d],
+                             self.snap0x0.electronic_coordinates[d])
+            assert_not_equal(snap.electronic_momenta[d],
+                             self.snap0x0.electronic_momenta[d])
 
     def test_features(self):
         from openpathsampling.features import coordinates as f_coordinates
