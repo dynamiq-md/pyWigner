@@ -18,6 +18,33 @@ class testOrthogonalInitialConditions(object):
                                                     self.e_sampler])
         # TODO set up snapshots
 
+    @raises(RuntimeError)
+    def test_error_with_none_dofs_overlap(self):
+        part_sampler = GaussianInitialConditions(x0=[0.0], alpha_x=[1.0],
+                                                 p0=[], alpha_p=[],
+                                                 coordinate_dofs=[1],
+                                                 momentum_dofs=[])
+        sampler = OrthogonalInitialConditions([self.normal_sampler,
+                                               self.e_sampler,
+                                               part_sampler])
+
+
+    @raises(RuntimeError)
+    def test_error_with_dofs_overlap(self):
+        part_sampler = GaussianInitialConditions(x0=[0.0], alpha_x=[1.0],
+                                                 p0=[], alpha_p=[],
+                                                 coordinate_dofs=[1],
+                                                 momentum_dofs=[])
+        part_sampler2 = GaussianInitialConditions(x0=[0.0], alpha_x=[1.0],
+                                                  p0=[], alpha_p=[],
+                                                  coordinate_dofs=[1],
+                                                  momentum_dofs=[])
+        sampler = OrthogonalInitialConditions([part_sampler, part_sampler2])
+        pass
+
+    def test_fixed_dofs_different_features(self):
+        pass
+
     def test_features(self):
         from openpathsampling.features import coordinates as f_coordinates
         from dynamiq_engine.features import momenta as f_momenta
@@ -26,10 +53,11 @@ class testOrthogonalInitialConditions(object):
         from dynamiq_engine.features import electronic_momenta \
                 as f_e_momenta
         
-        assert_equal(set(self.sampler.__features__), 
-                     set([f_coordinates, f_momenta, f_e_coordinates,
-                          f_e_momenta]))
-        pass
+        assert_equal(
+            set(self.sampler.__features__), 
+            set([f_coordinates, f_momenta, f_e_coordinates, f_e_momenta])
+        )
+
 
     def test_sampler(self):
         pass
