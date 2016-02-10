@@ -11,12 +11,33 @@ class testOrthogonalInitialConditions(object):
                                  potential=PotentialStub(2))
         self.normal_sampler = GaussianInitialConditions(
             x0=[0.0, 0.0], p0=[0.0, 0.0], 
-            alpha_x=[1.0, 1.0], alpha_p=[1.0, 1.0]
+            alpha_x=[2.0, 1.0], alpha_p=[2.0, 1.0]
         )
         self.e_sampler = MMSTElectronicGaussianInitialConditions.with_n_dofs(2)
         self.sampler = OrthogonalInitialConditions([self.normal_sampler,
                                                     self.e_sampler])
         # TODO set up snapshots
+        self.snap0x0 = dynq.MMSTSnapshot(
+            coordinates=np.array([0.0, 0.0]),
+            momenta=np.array([0.0, 0.0]),
+            electronic_coordinates=np.array([0.0, 0.0]),
+            electronic_momenta=np.array([0.0, 0.0]),
+            topology=topology
+        )
+        self.snap0x5 = dynq.MMSTSnapshot(
+            coordinates=np.array([0.5, 0.0]),
+            momenta=np.array([0.5, 0.0]),
+            electronic_coordinates=np.array([0.5, 0.0]),
+            electronic_momenta=np.array([0.5, 0.0]),
+            topology=topology
+        )
+        self.snap1x0 = dynq.MMSTSnapshot(
+            coordinates=np.array([1.0, 0.0]),
+            momenta=np.array([1.0, 0.0]),
+            electronic_coordinates=np.array([1.0, 0.0]),
+            electronic_momenta=np.array([1.0, 0.0]),
+            topology=topology
+        )
 
     @raises(RuntimeError)
     def test_error_with_none_dofs_overlap(self):
@@ -41,9 +62,6 @@ class testOrthogonalInitialConditions(object):
                                                   momentum_dofs=[])
         sampler = OrthogonalInitialConditions([part_sampler, part_sampler2])
 
-
-    def test_fixed_dofs_different_features(self):
-        pass
 
     def test_features(self):
         from openpathsampling.features import coordinates as f_coordinates
@@ -81,4 +99,26 @@ class testOrthogonalInitialConditions(object):
 
 
     def test_sampler(self):
-        pass
+        norm = 0.0205319645093687 # 2.0 / pi^4
+        tests = {
+            self.snap0x0 : norm,
+            self.snap0x5 : norm*np.exp(-2.0*(0.5**2)-4.0*(0.5**2)),
+            self.snap1x0 : norm*np.exp(-2.0*(1.0**2)-4.0*(1.0**2)),
+        }
+        check_function(self.sampler, tests)
+
+        snap = self.sampler.generate_initial_snapshot(self.snap0x0)
+        assert_not_equal(snap, self.snap0x0)
+        assert_equal(snap.topology, self.snap0x0.topology)
+        x_a = list(snap.coordinates.ravel())
+        x_b = list(self.snap0x0.coordinates.ravel())
+        p_a = list(snap.momenta.ravel())
+        p_b = list(self.snap0x0.momenta.ravel())
+        x_e_a = list(snap.electronic_coordinates.ravel())
+        x_e_b = list(self.snap0x0.electronic_coordinates.ravel())
+        p_e_a = list(snap.electronic_momenta.ravel())
+        p_e_b = list(self.snap0x0.electronic_momenta.ravel())
+        all_a = x_a + p_a + x_e_a + p_e_a
+        all_b = x_b + p_b + x_e_b + p_e_b
+        for (a, b) in zip(all_a, all_b):
+            assert_not_equal(a, b)
