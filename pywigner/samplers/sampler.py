@@ -50,13 +50,18 @@ class OrthogonalInitialConditions(InitialConditionSampler):
                             for f in self.__features__}
         self.feature_dofs = {}
         for f in feature_samplers:
-            if len(feature_samplers[f]) > 1:
-                all_dofs = sum(list(feature_samplers[f].feature_dofs), [])
+            samplers_f = feature_samplers[f]
+
+            all_dofs = []
+            for dofs_f in [fs.feature_dofs[f] for fs in samplers_f]:
+                if dofs_f is None:
+                    dofs_f = [None]
+                all_dofs.extend(dofs_f)
+
+            if len(samplers_f) > 1:
                 if None in all_dofs or len(all_dofs) != len(set(all_dofs)):
                     raise RuntimeError("Some dofs repeated for feature "+
                                        str(f))
-            else:
-                all_dofs = feature_samplers[f].feature_dofs
             self.feature_dofs[f] = all_dofs
 
 
