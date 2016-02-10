@@ -40,7 +40,7 @@ class testOrthogonalInitialConditions(object):
                                                   coordinate_dofs=[1],
                                                   momentum_dofs=[])
         sampler = OrthogonalInitialConditions([part_sampler, part_sampler2])
-        pass
+
 
     def test_fixed_dofs_different_features(self):
         pass
@@ -57,6 +57,27 @@ class testOrthogonalInitialConditions(object):
             set(self.sampler.__features__), 
             set([f_coordinates, f_momenta, f_e_coordinates, f_e_momenta])
         )
+        assert_equal(len(self.sampler.feature_dofs.keys()), 4)
+        assert_equal(self.sampler.feature_dofs,
+                     {f_coordinates : None, f_momenta : None,
+                      f_e_coordinates : None, f_e_momenta : None})
+
+        subsampler1 = MMSTElectronicGaussianInitialConditions(
+            x0=[0.0], alpha_x=[1.0], p0=[], alpha_p=[],
+            coordinate_dofs=[1], momentum_dofs=[]
+        )
+        subsampler2 = GaussianInitialConditions(
+            x0=[0.0], alpha_x=[1.0], p0=[], alpha_p=[],
+            coordinate_dofs=[1], momentum_dofs=[]
+        )
+        new_sampler = OrthogonalInitialConditions([subsampler1, subsampler2])
+        assert_equal(
+            set(new_sampler.__features__), 
+            set([f_coordinates, f_momenta, f_e_coordinates, f_e_momenta])
+        )
+        assert_equal(new_sampler.feature_dofs,
+                     {f_coordinates : [1], f_momenta : [],
+                      f_e_coordinates : [1], f_e_momenta : []})
 
 
     def test_sampler(self):
