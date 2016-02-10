@@ -1,4 +1,6 @@
 import operators
+import samplers
+import tools
 
 def git_rev_actual():
     from subprocess import check_output
