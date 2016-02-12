@@ -36,24 +36,25 @@ class CoherentProjection(Operator):
         self.x0 = x0.ravel()
         self.p0 = p0.ravel()
         self.gamma = gamma.ravel()
-        self.inv_gamma = 1.0 / gamma
+        self.inv_gamma = 1.0 / self.gamma
         assert(len(self.x0) == len(self.p0))
         self.n_dofs = len(list(self.x0))
 
-        self.gaussian_x = lsc.GaussianFunction(x0=self.x0, 
-                                               alpha=self.gamma)
-        self.gaussian_p = lsc.GaussianFunction(x0=self.p0,
-                                               alpha=self.inv_gamma)
+        self.gaussian_x = lsc.tools.GaussianFunction(x0=self.x0, 
+                                                     alpha=self.gamma)
+        self.gaussian_p = lsc.tools.GaussianFunction(x0=self.p0,
+                                                     alpha=self.inv_gamma)
 
         # set the sampling_gamma
         # sampling_gamma = sampling_ratio[n_exciton]*gamma
         # sampling_inv_gamma = sampling_ratio[n_exciton]*inv_gamma
         self.exciton_sampling_ratios = {0 : 1.0, 1 : 1.1}
-        self.sampler = self.default_sampler()
 
         # set up excitons
         self.excitons = clean_ravel(excitons, self.n_dofs)
         self._set_exciton_dict()
+
+        self.sampler = self.default_sampler()
 
 
     def _set_exciton_dict(self):
@@ -61,18 +62,18 @@ class CoherentProjection(Operator):
 
 
     def default_sampler(self):
-        alpha_x = [sampling_ratio[self.excitons[i]]*self.gamma[i]
+        alpha_x = [self.exciton_sampling_ratios[self.excitons[i]]*self.gamma[i]
                    for i in range(len(self.gamma))]
-        alpha_p = [sampling_ratio[self.excitons[i]]*self.inv_gamma[i]
+        alpha_p = [self.exciton_sampling_ratios[self.excitons[i]]*self.inv_gamma[i]
                    for i in range(len(self.inv_gamma))]
-        return lsc.GaussianInitialConditions(x0=self.x0, p0=self.p0,
-                                             alpha_x=alpha_x,
-                                             alpha_p=alpha_p)
+        return lsc.samplers.GaussianInitialConditions(x0=self.x0, p0=self.p0,
+                                                      alpha_x=alpha_x,
+                                                      alpha_p=alpha_p)
 
 
     def __call__(self, snapshot):
-        return (self.gaussian_x(snapshot.coordinates)
-                * self.gaussian_p(snapshot.momenta))
+        return (self.gaussian_x(snapshot.coordinates.ravel())
+                * self.gaussian_p(snapshot.momenta.ravel()))
 
     def excite(self, dof, excitons=1):
         try:

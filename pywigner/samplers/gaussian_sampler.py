@@ -43,9 +43,9 @@ class GaussianInitialConditions(InitialConditionSampler):
     @staticmethod
     def _get_feature(snapshot_array, dofs):
         if dofs is None:
-            return snapshot_array
+            return snapshot_array.ravel()
         else:
-            return [snapshot_array[i] for i in dofs]
+            return np.array([snapshot_array[i] for i in dofs]).ravel()
 
 
     def generate_initial_snapshot(self, previous_snapshot):

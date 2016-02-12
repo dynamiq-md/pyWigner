@@ -1,5 +1,6 @@
 import openpathsampling as paths
 import pywigner as lsc
+import dynamiq_engine as dynq
 import numpy as np
 from pywigner.operators import *
 
@@ -11,7 +12,19 @@ from nose.plugins.skip import SkipTest
 
 class OperatorTester(object):
     def __init__(self):
-        self.previous_trajectory = [0.0, 0.0] # TODO make better
+        topology = paths.ToyTopology(n_atoms=2, n_spatial=3, 
+                                     masses=np.array([1.5, 2.5]), pes=None)
+        self.previous_trajectory = [
+            dynq.Snapshot(
+                coordinates=np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]),
+                momenta=np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]),
+                topology=topology
+            ),
+            dynq.Snapshot(
+                coordinates=np.array([[0.1, 0.0, 0.0], [0.0, 0.0, 0.0]]),
+                momenta=np.array([[0.1, 0.0, 0.0], [0.0, 0.0, 0.0]]),
+                topology=topology)
+        ]
 
 
 class testOperator(OperatorTester):
@@ -22,8 +35,9 @@ class testOperator(OperatorTester):
     def test_sample_initial_conditions(self):
         self.op.sample_initial_conditions(self.previous_trajectory)
 
+    @raises(NotImplementedError)
     def test_correction(self):
-        assert_equal(self.op.correction(self.previous_trajectory[0]), 1.0)
+        self.op.correction(self.previous_trajectory[0])
 
     @raises(NotImplementedError)
     def test_call(self):
