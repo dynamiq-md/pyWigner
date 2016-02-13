@@ -26,19 +26,21 @@ class CoherentProjection(Operator):
     x0 : numpy.array
     p0 : numpy.array
     gamma : numpy.array
-    excitons : numpy.array
-    inv_gamma : numpy.array
-    position_sampling_width : numpy.array
-    momentum_sampling_width : numpy.array
+    dofs : list
+    excitons : list
     """
-    def __init__(self, x0, p0, gamma, excitons=0):
+    def __init__(self, x0, p0, gamma, dofs=None, excitons=0):
         # set gaussian parameters
         self.x0 = x0.ravel()
         self.p0 = p0.ravel()
         self.gamma = gamma.ravel()
         self.inv_gamma = 1.0 / self.gamma
+        self.dofs = dofs
         assert(len(self.x0) == len(self.p0))
-        self.n_dofs = len(list(self.x0))
+        if self.dofs is None:
+            self.n_dofs = len(list(self.x0))
+        else:
+            self.n_dofs = len(dofs)
 
         self.gaussian_x = lsc.tools.GaussianFunction(x0=self.x0, 
                                                      alpha=self.gamma)
@@ -60,15 +62,24 @@ class CoherentProjection(Operator):
     def _set_exciton_dict(self):
         self._exciton_dict = {e.index() : e for e in self.excitons if e > 0}
 
+    # note sure whether I'll need this in here....
+    #@staticmethod
+    #def _get_feature(feature_array, dofs):
+    #    if dofs is None:
+    #        return feature_array.ravel()
+    #    else:
+    #        return np.array([feature_array.ravel()[i] for i in dofs])
+
 
     def default_sampler(self):
         alpha_x = [self.exciton_sampling_ratios[self.excitons[i]]*self.gamma[i]
                    for i in range(len(self.gamma))]
         alpha_p = [self.exciton_sampling_ratios[self.excitons[i]]*self.inv_gamma[i]
                    for i in range(len(self.inv_gamma))]
-        return lsc.samplers.GaussianInitialConditions(x0=self.x0, p0=self.p0,
-                                                      alpha_x=alpha_x,
-                                                      alpha_p=alpha_p)
+        return lsc.samplers.GaussianInitialConditions(
+            x0=self.x0, alpha_x=alpha_x, coordinate_dofs=self.dofs,
+            p0=self.p0, alpha_p=alpha_p, momentum_dofs=self.dofs
+        )
 
 
     def __call__(self, snapshot):
@@ -85,8 +96,17 @@ class CoherentProjection(Operator):
         self._set_exciton_dict()
 
 class ElectronicCoherentProjection(CoherentProjection):
-    def __call__(self, snapshot):
-        pass
+    @classmethod
+    def with_n_dofs(cls, n_dofs):
+        return cls(
+            x0=np.array([0.0]*n_dofs), 
+            p0=np.array([0.0]*n_dofs), 
+            gamma=np.array([0.0]*n_dofs)
+        )
 
-    def sampling_function(self, snapshot):
-        pass
+    def __call__(self, snapshot):
+        return (self.gaussian_x(snapshot.electronic_coordinates.ravel())
+                * self.gaussian_p(snapshot.electronic_momenta.ravel()))
+
+    def default_sampler(self):
+        return lsc.samplers.MMSTElectronicGaussianInitialConditions.with_n_dofs(2)
