@@ -75,13 +75,19 @@ class CoherentProjection(Operator):
         # sampling_inv_gamma = sampling_ratio[n_exciton]*inv_gamma
         self.exciton_sampling_ratios = {0 : 1.0, 1 : 1.1}
 
-        # set up excitons
-        self.excitons = clean_ravel(excitons, self.n_dofs)
-        self._set_exciton_dict()
+        # set up excitons: must be done AFTER setting self.n_dofs
+        self.excitons = excitons
 
+    @property
+    def excitons(self):
+        return self._excitons
 
-    def _set_exciton_dict(self):
-        self._exciton_dict = {e.index() : e for e in self.excitons if e > 0}
+    @excitons.setter
+    def excitons(self, val):
+        self._excitons = clean_ravel(val, self.n_dofs)
+        self._exciton_dict = {i : self._excitons[i] 
+                              for i in range(len(self._excitons)) 
+                              if self._excitons[i] > 0}
 
     @staticmethod
     def _get_feature(feature_array, dofs):
@@ -115,9 +121,11 @@ class CoherentProjection(Operator):
             paired = zip(dof, excitons)
         except TypeError:
             paired = [(dof, excitons)]
+
+        old_excitons = self.excitons
         for (d, e) in paired:
-            self.excitons[d] = e
-        self._set_exciton_dict()
+            old_excitons[d] = e
+        self.excitons = old_excitons
 
 class ElectronicCoherentProjection(CoherentProjection):
     @classmethod

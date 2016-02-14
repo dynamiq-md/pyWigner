@@ -73,7 +73,19 @@ class testCoherentProjection(OperatorTester):
             assert_equal(len(op.inv_gamma), op.n_dofs)
 
     def test_set_excitons(self):
-        raise SkipTest
+        assert_equal(self.op.excitons, [0,0])
+        assert_equal(self.op._excitons, [0,0])
+        assert_equal(self.op._exciton_dict, {})
+
+        self.op.excitons = [1, 0]
+        assert_equal(self.op.excitons, [1,0])
+        assert_equal(self.op._excitons, [1,0])
+        assert_equal(self.op._exciton_dict, {0: 1})
+
+        self.op.excite(dof=0, excitons=0)
+        assert_equal(self.op.excitons, [0,0])
+        assert_equal(self.op._excitons, [0,0])
+        assert_equal(self.op._exciton_dict, {})
     
     def test_sample_initial_conditions(self):
         # not much we can do here except check that the resulting snapshot
