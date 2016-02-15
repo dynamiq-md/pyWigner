@@ -28,6 +28,7 @@ class GaussianInitialConditions(InitialConditionSampler):
 
         self.coordinate_gaussian = lsc.tools.GaussianFunction(x0, alpha_x)
         self.momentum_gaussian = lsc.tools.GaussianFunction(p0, alpha_p)
+        self.norm = self.coordinate_gaussian.norm*self.momentum_gaussian.norm
 
     @staticmethod
     def _fill_feature(snapshot_array, sampler, dofs):
