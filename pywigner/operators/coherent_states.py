@@ -94,7 +94,8 @@ class CoherentProjection(Operator):
         # undoing doing some extra multiplications here; needed to keep
         # `correction` in line -- but there might be a better way.
         # TODO: is this actually correct?
-        self.norm = 1.0/(self.gaussian_x.norm * self.gaussian_p.norm)
+        self.norm = np.prod([2.0]*self.n_dofs)
+        self.norm *= 1.0/(self.gaussian_x.norm * self.gaussian_p.norm)
 
         # set the sampling_gamma
         # sampling_gamma = sampling_ratio[n_exciton]*gamma
@@ -135,14 +136,6 @@ class CoherentProjection(Operator):
             p0=self.p0, alpha_p=alpha_p, momentum_dofs=self.dofs
         )
 
-
-    def __call__(self, snapshot):
-        x_vals = self._get_feature(snapshot.coordinates.ravel(), self.dofs)
-        p_vals = self._get_feature(snapshot.momenta.ravel(), self.dofs)
-        # TODO: correct for excite; check for normalization
-        result = self.norm * self.gaussian_x(x_vals) * self.gaussian_p(p_vals)
-        return result
-
     def excite(self, dof, excitons=1):
         try:
             paired = zip(dof, excitons)
@@ -153,6 +146,26 @@ class CoherentProjection(Operator):
         for (d, e) in paired:
             old_excitons[d] = e
         self.excitons = old_excitons
+
+    def _call_excited_part(self, x_vals, p_vals):
+        result = 1.0
+        for (i, n) in self._exciton_dict.items():
+            x_i = x_vals[i]
+            p_i = p_vals[i]
+            if n == 1:
+                result *= 2.0*(x_i*x_i + p_i*p_i - 0.5)
+        return result
+
+    def __call__(self, snapshot):
+        x_vals = self._get_feature(snapshot.coordinates.ravel(), self.dofs)
+        p_vals = self._get_feature(snapshot.momenta.ravel(), self.dofs)
+
+        # TODO: correct for excite; check for normalization
+        standard_part = self.gaussian_x(x_vals) * self.gaussian_p(p_vals)
+        excited_part = self._call_excited_part(x_vals, p_vals)
+        result = self.norm * standard_part * excited_part
+        return result
+
 
 class ElectronicCoherentProjection(CoherentProjection):
     @classmethod

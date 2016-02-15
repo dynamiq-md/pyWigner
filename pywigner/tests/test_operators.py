@@ -97,12 +97,12 @@ class testCoherentProjection(OperatorTester):
         sampler = self.op.default_sampler()
         assert_almost_equal(
             self.op.correction(self.previous_trajectory[0], sampler), 
-            1.0
+            2.0**self.op.n_dofs
         )
 
     def test_call(self):
-        norm_op = 1.0
-        norm_dof_op = 1.0
+        norm_op = 2.0**2
+        norm_dof_op = 2.0**1
         assert_almost_equal(self.op(self.snap0), norm_op)
         assert_almost_equal(self.dof_op(self.snap0), norm_dof_op)
 
