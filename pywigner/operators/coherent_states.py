@@ -78,18 +78,23 @@ class CoherentProjection(Operator):
             self.n_dofs = len(list(self.x0))
         else:
             self.n_dofs = len(dofs)
+
+        # sanity checks for bad input
         assert(len(self.x0) == len(self.p0))
         assert(len(self.gamma) == len(self.x0))
         assert(len(self.p0) == self.n_dofs)
 
-        self.norm = 1.0 # TODO: is this actually correct?
-
         self.gaussian_x = lsc.tools.GaussianFunction(x0=self.x0, 
-                                                     alpha=self.gamma,
-                                                     normed=False)
+                                                     alpha=self.gamma)
         self.gaussian_p = lsc.tools.GaussianFunction(x0=self.p0,
-                                                     alpha=self.inv_gamma,
-                                                     normed=False)
+                                                     alpha=self.inv_gamma)
+
+        # This sets the total factor outside the Wigner function to 1.0,
+        # since the norms of the gaussians otherwise carry. Note that we're
+        # undoing doing some extra multiplications here; needed to keep
+        # `correction` in line -- but there might be a better way.
+        # TODO: is this actually correct?
+        self.norm = 1.0/(self.gaussian_x.norm * self.gaussian_p.norm)
 
         # set the sampling_gamma
         # sampling_gamma = sampling_ratio[n_exciton]*gamma

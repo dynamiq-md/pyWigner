@@ -19,7 +19,7 @@ class Operator(StorableObject):
         Operators can override this to use shortcuts with various types of
         samplers.
         """
-        retval = self(snapshot) / sampler(snapshot)
+        retval = self(snapshot) / sampler(snapshot) * sampler.norm
         # TODO: add checks for TypeError if self.sampler isn't callable?
         return retval
 

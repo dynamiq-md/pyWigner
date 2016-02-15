@@ -43,20 +43,20 @@ class testOperator(OperatorTester):
 
 class testCoherentProjection(OperatorTester):
     def setup(self):
-        snap0 = dynq.Snapshot(
+        self.snap0 = dynq.Snapshot(
             coordinates=np.array([1.5, 1.0]),
             momenta=np.array([0.5, 3.0]),
             topology=self.topology
         )
         self.op = CoherentProjection(
-            x0=snap0.coordinates,
-            p0=snap0.momenta,
+            x0=self.snap0.coordinates.copy(),
+            p0=self.snap0.momenta.copy(),
             gamma=np.array([4.0, 5.0])
         )
         self.dof_op = CoherentProjection(
             x0=np.array([1.0]),
-            p0=np.array([0.0]),
-            gamma=np.array([1.5]),
+            p0=np.array([3.0]),
+            gamma=np.array([5.0]),
             dofs=[1]
         )
 
@@ -95,10 +95,28 @@ class testCoherentProjection(OperatorTester):
 
     def test_correction(self):
         sampler = self.op.default_sampler()
-        assert_equal(self.op.correction(self.previous_trajectory[0], sampler),
-                     1.0)
+        assert_almost_equal(
+            self.op.correction(self.previous_trajectory[0], sampler), 
+            1.0
+        )
 
     def test_call(self):
+        norm_op = 1.0
+        norm_dof_op = 1.0
+        assert_almost_equal(self.op(self.snap0), norm_op)
+        assert_almost_equal(self.dof_op(self.snap0), norm_dof_op)
+
+        snap = dynq.Snapshot(
+            coordinates=np.array([1.0, 0.75]),
+            momenta=np.array([2.0, 6.0]),
+            topology=self.topology
+        )
+        # dof0: exp(-4.0*(1.0-1.5)^2 - 1/4.0*(2.0-0.5)^2) = 0.209611387151098
+        # dof1: exp(-5.0*(0.75-1.0)^2 - 1/5.0*(6.0-3.0)^2) = 0.120935250070417
+        # dof1 * dof2 = 0.0253494055227250
+        assert_almost_equal(self.op(snap), norm_op*0.0253494055227250)
+        assert_almost_equal(self.dof_op(snap), norm_dof_op*0.120935250070417)
+        
         raise SkipTest
 
     def test_excited(self):
