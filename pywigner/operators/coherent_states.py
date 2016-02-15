@@ -31,15 +31,32 @@ class CoherentProjection(Operator):
         = \frac{\gamma}{\pi} 
           \exp\(-\frac{\gamma}{2}(x - x_0)^2 + i p_0 (x-x_0)\)
 
-    TODO: check sign of the imaginary part
 
     This gives us the Wigner function:
     
     .. math::
         (|x_0 p_0; \gamma><x_0 p_0; \gamma|)_W(q, p)
-        =
-    
-    TODO: fill this in
+        = ??? \exp(-\gamma (q-x_0)^2 - 1/\gamma (p-p_0)^2
+
+    TODO: fill in the norm correctly
+
+    Of course, the total operator is the product of this for each degree of
+    freedom.
+
+    Using excited state wavepackets (for which we assume that the coherent
+    state is the ground state of some harmonic oscillator, and then we
+    excite a mode) gives a very simple correction to this. So far, the code
+    only supports the first excitation, where the correction is
+
+    .. math::
+        (|x_0 p_0; \gamma, n=1><x_0 p_0; \gamma, n=1|)_W(q, p) =
+        D_1(q, p) (|x_0 p_0; \gamma><x_0 p_0; \gamma|)_W(q, p)
+
+    where
+
+    .. math::
+        D_1(q, p) = ???
+        
 
 
     Attributes
@@ -65,10 +82,14 @@ class CoherentProjection(Operator):
         assert(len(self.gamma) == len(self.x0))
         assert(len(self.p0) == self.n_dofs)
 
+        self.norm = 1.0 # TODO: is this actually correct?
+
         self.gaussian_x = lsc.tools.GaussianFunction(x0=self.x0, 
-                                                     alpha=self.gamma)
+                                                     alpha=self.gamma,
+                                                     normed=False)
         self.gaussian_p = lsc.tools.GaussianFunction(x0=self.p0,
-                                                     alpha=self.inv_gamma)
+                                                     alpha=self.inv_gamma,
+                                                     normed=False)
 
         # set the sampling_gamma
         # sampling_gamma = sampling_ratio[n_exciton]*gamma
@@ -114,7 +135,8 @@ class CoherentProjection(Operator):
         x_vals = self._get_feature(snapshot.coordinates.ravel(), self.dofs)
         p_vals = self._get_feature(snapshot.momenta.ravel(), self.dofs)
         # TODO: correct for excite; check for normalization
-        return self.gaussian_x(x_vals) * self.gaussian_p(p_vals)
+        result = self.norm * self.gaussian_x(x_vals) * self.gaussian_p(p_vals)
+        return result
 
     def excite(self, dof, excitons=1):
         try:

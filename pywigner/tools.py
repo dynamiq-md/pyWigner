@@ -12,11 +12,14 @@ def clean_ravel(arr, n_dofs):
 
 
 class GaussianFunction(object):
-    def __init__(self, x0, alpha):
+    def __init__(self, x0, alpha, normed=True):
         self.x0 = np.array(x0)
         self.alpha = np.array(alpha)
         self.sigma = 1.0/np.sqrt(2.0*self.alpha)
-        self.norm = np.prod(np.sqrt(self.alpha / np.pi))
+        if normed:
+            self.norm = np.prod(np.sqrt(self.alpha / np.pi))
+        else:
+            self.norm = 1.0
         assert(self.x0.shape == self.alpha.shape)
         self._internal = np.zeros_like(self.alpha)
 
