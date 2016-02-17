@@ -177,8 +177,26 @@ class ElectronicCoherentProjection(CoherentProjection):
         )
 
     def __call__(self, snapshot):
-        return (self.gaussian_x(snapshot.electronic_coordinates.ravel())
-                * self.gaussian_p(snapshot.electronic_momenta.ravel()))
+        x_vals = self._get_feature(snapshot.electronic_coordinates.ravel(), 
+                                   self.dofs)
+        p_vals = self._get_feature(snapshot.electronic_momenta.ravel(), 
+                                   self.dofs)
+
+        # TODO: correct for excite; check for normalization
+        standard_part = self.gaussian_x(x_vals) * self.gaussian_p(p_vals)
+        excited_part = self._call_excited_part(x_vals, p_vals)
+        result = self.norm * standard_part * excited_part
+        return result
 
     def default_sampler(self):
-        return lsc.samplers.MMSTElectronicGaussianInitialConditions.with_n_dofs(2)
+        if exciton_sampling_ratios is None:
+            exciton_sampling_ratios = self.exciton_sampling_ratios
+        #TODO: check that these gamma->alpha setups are correct
+        alpha_x = [exciton_sampling_ratios[self.excitons[i]]*self.gamma[i]
+                   for i in range(len(self.gamma))]
+        alpha_p = [exciton_sampling_ratios[self.excitons[i]]*self.inv_gamma[i]
+                   for i in range(len(self.inv_gamma))]
+        return lsc.samplers.MMSTElectronicGaussianInitialConditions(
+            x0=self.x0, alpha_x=alpha_x, coordinate_dofs=self.dofs,
+            p0=self.p0, alpha_p=alpha_p, momentum_dofs=self.dofs
+        )
