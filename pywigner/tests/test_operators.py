@@ -120,7 +120,22 @@ class testCoherentProjection(OperatorTester):
         raise SkipTest
 
     def test_excited(self):
-        raise SkipTest
+        snap = dynq.Snapshot(
+            coordinates=np.array([1.0, 0.75]),
+            momenta=np.array([2.0, 6.0]),
+            topology=self.topology
+        )
+        unexcited = self.op(snap)
+        self.op.excite(dof=1)
+        # excited correction = 2*((0.75-1.0)**2 + (6.0-3.0)**2 -1) = 17.125
+        assert_almost_equal(
+            self.op._call_excited_part(snap.coordinates, snap.momenta),
+            17.125
+        )
+        assert_almost_equal(self.op(snap) / unexcited, 17.125)
+
+        self.op.excite(dof=1, excitons=0)
+        assert_almost_equal(self.op(snap), unexcited)
 
     def test_with_paths_snapshot(self):
         # NOTE: this will have to wait until `paths.Snapshot` has a

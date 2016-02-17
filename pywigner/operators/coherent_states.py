@@ -150,8 +150,8 @@ class CoherentProjection(Operator):
     def _call_excited_part(self, x_vals, p_vals):
         result = 1.0
         for (i, n) in self._exciton_dict.items():
-            x_i = x_vals[i]
-            p_i = p_vals[i]
+            x_i = x_vals[i] - self.x0[i]
+            p_i = p_vals[i] - self.p0[i]
             if n == 1:
                 result *= 2.0*(x_i*x_i + p_i*p_i - 0.5)
         return result
