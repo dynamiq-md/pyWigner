@@ -90,8 +90,8 @@ class testCoherentProjection(OperatorTester):
     def test_sample_initial_conditions(self):
         # not much we can do here except check that the resulting snapshot
         # exists and has the right number of attributes
-        #snap = self.op.sample_initial_conditions(self.previous_trajectory)
-        raise SkipTest
+        sampler = self.op.default_sampler()
+        snap = sampler.generate_initial_snapshot(self.snap0)
 
     def test_correction(self):
         sampler = self.op.default_sampler()
@@ -117,7 +117,6 @@ class testCoherentProjection(OperatorTester):
         assert_almost_equal(self.op(snap), norm_op*0.0253494055227250)
         assert_almost_equal(self.dof_op(snap), norm_dof_op*0.120935250070417)
         
-        raise SkipTest
 
     def test_excited(self):
         snap = dynq.Snapshot(
@@ -143,4 +142,26 @@ class testCoherentProjection(OperatorTester):
         raise SkipTest
 
 
+class testElectronicCoherentProjection(OperatorTester):
+    def setup(self):
+        self.op = ElectronicCoherentProjection.with_n_dofs(2).excite(1)
+        self.snap0 = dynq.MMSTSnapshot(
+            coordinates=np.array([]),
+            momenta=np.array([]),
+            electronic_coordinates=np.array([0.5, 0.75]),
+            electronic_momenta=np.array([0.4, 0.3]),
+            topology=None
+        )
 
+    def test_call(self):
+        norm_op = 2.0**2
+        # dof0 : exp(-(0.5)**2 - (0.4)**2) = 0.663650250136319
+        # dof1 : exp(-(0.75)**2 - (0.3)**2) = 0.520742292353521
+        # dof1_excited = 2*(0.75**2 + 0.3**2 - 0.5) = 0.305
+        # standard = dof0*dof1 = 0.345590752576974
+        # total = stadard*excited= 0.105405179535977
+        assert_almost_equal(self.op(self.snap0), norm_op*0.105405179535977)
+
+    def test_sample_initial_conditions(self):
+        sampler = self.op.default_sampler()
+        snap = sampler.generate_initial_snapshot(self.snap0)

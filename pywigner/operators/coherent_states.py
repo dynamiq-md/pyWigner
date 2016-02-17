@@ -146,6 +146,7 @@ class CoherentProjection(Operator):
         for (d, e) in paired:
             old_excitons[d] = e
         self.excitons = old_excitons
+        return self
 
     def _call_excited_part(self, x_vals, p_vals):
         result = 1.0
@@ -173,7 +174,7 @@ class ElectronicCoherentProjection(CoherentProjection):
         return cls(
             x0=np.array([0.0]*n_dofs), 
             p0=np.array([0.0]*n_dofs), 
-            gamma=np.array([0.0]*n_dofs)
+            gamma=np.array([1.0]*n_dofs)
         )
 
     def __call__(self, snapshot):
@@ -188,7 +189,7 @@ class ElectronicCoherentProjection(CoherentProjection):
         result = self.norm * standard_part * excited_part
         return result
 
-    def default_sampler(self):
+    def default_sampler(self, exciton_sampling_ratios=None):
         if exciton_sampling_ratios is None:
             exciton_sampling_ratios = self.exciton_sampling_ratios
         #TODO: check that these gamma->alpha setups are correct
