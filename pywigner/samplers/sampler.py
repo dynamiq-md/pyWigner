@@ -58,13 +58,14 @@ class OrthogonalInitialConditions(InitialConditionSampler):
                     dofs_f = [None]
                 all_dofs.extend(dofs_f)
 
-            if all_dofs == [None]:
-                all_dofs = None
-
             if len(samplers_f) > 1:
                 if None in all_dofs or len(all_dofs) != len(set(all_dofs)):
                     raise RuntimeError("Some dofs repeated for feature "+
                                        str(f))
+
+            if all_dofs == [None]:
+                all_dofs = None
+
             self.feature_dofs[f] = all_dofs
 
 
