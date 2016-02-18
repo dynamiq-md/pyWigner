@@ -1,13 +1,11 @@
 from openpathsampling.netcdfplus import StorableObject
 import numpy as np
+import pywigner as lsc
 
 
 class Operator(StorableObject):
     def __init__(self):
         self.sampler = None
-
-    def sample_initial_conditions(self, previous_trajectory):
-        raise NotImplementedError("Can't sample from abstract operator")
 
     def correction(self, snapshot, sampler):
         """ Op.correction(snapshot) = Op(snapshot) / Op.sampler(snapshot)
@@ -28,3 +26,22 @@ class Operator(StorableObject):
 
     def default_sampler(self):
         raise NotImplementedError("No default sampler for abstract operator")
+
+
+class OrthogonalProductOperator(Operator):
+    def __init__(self, operators):
+        super(OrthogonalProductOperator, self).__init__()
+        self.operators = operators
+        # TODO: check that the operators really are othogonal? Or leave that
+        # to the sampler?
+
+    def __call__(self, snapshot):
+        result = 1.0
+        for op in self.operators:
+            result *= op(snapshot)
+        return result
+
+    def default_sampler(self):
+        return lsc.sampler.OrthogonalInitialConditions(
+            [op.default_sampler() for op in self.operators]
+        )

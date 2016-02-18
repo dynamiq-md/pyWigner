@@ -34,12 +34,19 @@ class testOperator(OperatorTester):
         self.op = Operator()
 
     @raises(NotImplementedError)
-    def test_sample_initial_conditions(self):
-        self.op.sample_initial_conditions(self.previous_trajectory)
-
-    @raises(NotImplementedError)
     def test_call(self):
-        self.op.sample_initial_conditions(self.previous_trajectory[0])
+        self.op(self.previous_trajectory[0])
+
+class testOrthogonalProductOperator(OperatorTester):
+    def setup(self):
+        pass
+
+    def test_call(self):
+        raise SkipTest
+
+    def test_default_sampler(self):
+        raise SkipTest
+
 
 class testCoherentProjection(OperatorTester):
     def setup(self):
