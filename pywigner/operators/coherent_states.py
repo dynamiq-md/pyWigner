@@ -12,6 +12,12 @@ def real_multidim_gaussian(x, x0, gamma):
     numpy.mul(expon, gamma, expon) # gamma*dx^2
     return np.exp(-np.sum(expon))
 
+def raveled_numpyify(arr):
+    try:
+        retval = arr.ravel()
+    except AttributeError:
+        retval = np.array(arr)
+    return retval
 
 class CoherentProjection(Operator):
     """
@@ -69,9 +75,9 @@ class CoherentProjection(Operator):
     """
     def __init__(self, x0, p0, gamma, dofs=None, excitons=0):
         # set gaussian parameters
-        self.x0 = x0.ravel()
-        self.p0 = p0.ravel()
-        self.gamma = gamma.ravel()
+        self.x0 = raveled_numpyify(x0)
+        self.p0 = raveled_numpyify(p0)
+        self.gamma = raveled_numpyify(gamma)
         self.inv_gamma = 1.0 / self.gamma
         self.dofs = dofs
         if self.dofs is None:
