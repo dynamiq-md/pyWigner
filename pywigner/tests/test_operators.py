@@ -37,7 +37,7 @@ class testOperator(OperatorTester):
     def test_call(self):
         self.op(self.previous_trajectory[0])
 
-class testOrthogonalProductOperator(OperatorTester):
+class testProductOperator(OperatorTester):
     def setup(self):
         nuclear = CoherentProjection(
             x0=np.array([1.5, 1.0]),
@@ -45,7 +45,7 @@ class testOrthogonalProductOperator(OperatorTester):
             gamma=np.array([4.0, 5.0])
         )
         electronic = ElectronicCoherentProjection.with_n_dofs(2).excite(1)
-        self.op = OrthogonalProductOperator([nuclear, electronic])
+        self.op = nuclear * electronic
         self.snap0 = dynq.MMSTSnapshot(
             coordinates=np.array([1.0, 0.75]),
             momenta=np.array([2.0, 6.0]),

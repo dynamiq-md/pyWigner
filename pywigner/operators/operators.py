@@ -7,6 +7,9 @@ class Operator(StorableObject):
     def __init__(self):
         self.sampler = None
 
+    def __mul__(self, other):
+        return ProductOperator([self, other])
+
     def correction(self, snapshot, sampler):
         """ Op.correction(snapshot) = Op(snapshot) / Op.sampler(snapshot)
 
@@ -28,18 +31,21 @@ class Operator(StorableObject):
         raise NotImplementedError("No default sampler for abstract operator")
 
 
-class OrthogonalProductOperator(Operator):
+class ProductOperator(Operator):
     def __init__(self, operators):
-        super(OrthogonalProductOperator, self).__init__()
+        super(ProductOperator, self).__init__()
         self.operators = operators
-        # TODO: check that the operators really are othogonal? Or leave that
-        # to the sampler?
+        # NOTE: we don't check any orthogonality here, but it will show up
+        # if you try to use the default sampler.
 
     def __call__(self, snapshot):
         result = 1.0
         for op in self.operators:
             result *= op(snapshot)
         return result
+
+    def __mul__(self, other):
+        self.operators.append(other)
 
     def default_sampler(self):
         return lsc.samplers.OrthogonalInitialConditions(
