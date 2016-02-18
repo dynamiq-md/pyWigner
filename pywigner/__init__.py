@@ -1,5 +1,5 @@
-import operators
-import samplers
+import pywigner.operators
+import pywigner.samplers
 import tools
 
 def git_rev_actual():

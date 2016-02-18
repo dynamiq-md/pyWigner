@@ -18,14 +18,15 @@ script:
     - ls
     - export PYWIGNER=`pwd`
     - cd && git clone https://github.com/dynamiq-md/dynamiq_engine
+    - ls
     - cd dynamiq_engine && setup.py install
     - cd $PYWIGNER
     - ls
     # end of dynamiq_engine install
-    - nosetests -v --with-coverage
+    #- nosetests -v --with-coverage
 
 after_success:
-    - coveralls
+    #- coveralls
 
 env:
     matrix:
