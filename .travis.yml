@@ -14,6 +14,14 @@ script:
     - conda build devtools/conda-recipe
     
     - source activate _test
+    # this is where we install dynamiq_engine
+    - ls
+    - export PYWIGNER=`pwd`
+    - cd && git clone https://github.com/dynamiq-md/dynamiq_engine
+    - cd dynamiq_engine && setup.py install
+    - cd $PYWIGNER
+    - ls
+    # end of dynamiq_engine install
     - nosetests -v --with-coverage
 
 after_success:
