@@ -39,13 +39,42 @@ class testOperator(OperatorTester):
 
 class testOrthogonalProductOperator(OperatorTester):
     def setup(self):
-        pass
+        nuclear = CoherentProjection(
+            x0=np.array([1.5, 1.0]),
+            p0=np.array([0.5, 3.0]),
+            gamma=np.array([4.0, 5.0])
+        )
+        electronic = ElectronicCoherentProjection.with_n_dofs(2).excite(1)
+        self.op = OrthogonalProductOperator([nuclear, electronic])
+        self.snap0 = dynq.MMSTSnapshot(
+            coordinates=np.array([1.0, 0.75]),
+            momenta=np.array([2.0, 6.0]),
+            electronic_coordinates=np.array([0.5, 0.75]),
+            electronic_momenta=np.array([0.4, 0.3]),
+            topology=None # can I get away with that?
+        )
 
     def test_call(self):
-        raise SkipTest
+        # nuclear = 0.0253494055227250
+        # electronic = 0.105405179535977
+        norm_op = 2.0**4
+        assert_almost_equal(self.op(self.snap0), 
+                            norm_op*0.0253494055227250*0.105405179535977)
 
     def test_default_sampler(self):
-        raise SkipTest
+        sampler = self.op.default_sampler()
+        snap = sampler.generate_initial_snapshot(self.snap0)
+
+        for (a, b) in zip(snap.coordinates, self.snap0.coordinates):
+            assert_not_equal(a,b)
+        for (a, b) in zip(snap.momenta, self.snap0.momenta):
+            assert_not_equal(a,b)
+        for (a, b) in zip(snap.electronic_coordinates,
+                          self.snap0.electronic_coordinates):
+            assert_not_equal(a,b)
+        for (a, b) in zip(snap.electronic_momenta,
+                          self.snap0.electronic_momenta):
+            assert_not_equal(a,b)
 
 
 class testCoherentProjection(OperatorTester):

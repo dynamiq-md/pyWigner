@@ -42,6 +42,6 @@ class OrthogonalProductOperator(Operator):
         return result
 
     def default_sampler(self):
-        return lsc.sampler.OrthogonalInitialConditions(
+        return lsc.samplers.OrthogonalInitialConditions(
             [op.default_sampler() for op in self.operators]
         )

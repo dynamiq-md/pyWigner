@@ -1,2 +1,2 @@
-from operators import Operator
+from operators import Operator, OrthogonalProductOperator
 from coherent_states import CoherentProjection, ElectronicCoherentProjection
