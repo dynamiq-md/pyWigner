@@ -19,7 +19,7 @@ script:
     - export PYWIGNER=`pwd`
     - cd && git clone https://github.com/dynamiq-md/dynamiq_engine
     - ls
-    - cd dynamiq_engine && setup.py install
+    - cd dynamiq_engine && python setup.py install
     - cd $PYWIGNER
     - ls
     # end of dynamiq_engine install
