@@ -6,11 +6,11 @@ python:
 install:
     - deactivate
     - source devtools/ci/install_conda.sh
-    # TODO: need to download and build dynamiq_engine in test environment
     - export PYTHONUNBUFFERED=true
 
 script:
     - conda install --yes conda-build
+    - conda build devtools/dynq_engine_recipe
     - conda build devtools/conda-recipe
     
     - source activate _test
