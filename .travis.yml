@@ -14,7 +14,7 @@ script:
     
     - source activate _test
     # end of dynamiq_engine install
-    #- nosetests -v --with-coverage
+    - nosetests -v --with-coverage
 
 after_success:
     #- coveralls
