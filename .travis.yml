@@ -10,18 +10,9 @@ install:
 
 script:
     - conda install --yes conda-build
-    - conda build devtools/dynq_engine_recipe
     - conda build devtools/conda-recipe
     
     - source activate _test
-    # this is where we install dynamiq_engine
-    - ls
-    - export PYWIGNER=`pwd`
-    - cd && git clone https://github.com/dynamiq-md/dynamiq_engine
-    - ls
-    - cd dynamiq_engine && python setup.py install
-    - cd $PYWIGNER
-    - ls
     # end of dynamiq_engine install
     #- nosetests -v --with-coverage
 
