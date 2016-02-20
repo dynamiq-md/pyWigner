@@ -1,10 +1,8 @@
 #!/bin/bash
 
-cp -r $RECIPE_DIR/../.. $SRC_DIR
+export PYWIGNER=`pwd`
+cd && git clone https://github.com/dynamiq-md/dynamiq_engine
+cd dynamiq_engine && python setup.py install
+cd $PYWIGNER
+
 $PYTHON setup.py install
-
-# Add more build steps here, if they are necessary.
-
-# See
-# http://docs.continuum.io/conda/build.html
-# for a list of environment variables that are set during the build process.

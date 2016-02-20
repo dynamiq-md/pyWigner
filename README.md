@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/dwhswenson/pyWigner.svg?branch=master)](https://travis-ci.org/dwhswenson/pyWigner)
+[![Coverage Status](https://coveralls.io/repos/github/dwhswenson/pyWigner/badge.svg?branch=travis)](https://coveralls.io/github/dwhswenson/pyWigner?branch=travis)
+
 # pyWigner
 Python toolkit for LSC-IVR (classical Wigner) simulations, built on
 [OpenPathSampling](http://www.openpathsampling.org)
