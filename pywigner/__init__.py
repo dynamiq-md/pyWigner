@@ -1,7 +1,7 @@
 import operators
 import tools
 
-def git_rev_actual():
+def git_rev_actual(): # pragma: no-cover
     from subprocess import check_output
     import os.path
     git_dir = os.path.dirname(os.path.realpath(__file__))
