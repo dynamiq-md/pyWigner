@@ -4,15 +4,6 @@ import pywigner as lsc
 import dynamiq_samplers as samplers
 import numpy as np
 
-def real_multidim_gaussian(x, x0, gamma):
-    """exp(-\sum_i gamma_i*(x_i-x0_i)^2)"""
-    # TODO: note that this might be sped up by reusing expon instead of
-    # re-alloc'ing.
-    expon = numpy.sub(x-x0) # dx
-    numpy.mul(expon, expon, expon) # dx^2
-    numpy.mul(expon, gamma, expon) # gamma*dx^2
-    return np.exp(-np.sum(expon))
-
 def raveled_numpyify(arr):
     try:
         retval = arr.ravel()
