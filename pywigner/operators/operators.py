@@ -1,5 +1,6 @@
 from openpathsampling.netcdfplus import StorableObject
 import numpy as np
+import dynamiq_samplers as samplers
 import pywigner as lsc
 
 
@@ -48,6 +49,6 @@ class ProductOperator(Operator):
         self.operators.append(other)
 
     def default_sampler(self):
-        return lsc.samplers.OrthogonalInitialConditions(
+        return samplers.OrthogonalInitialConditions(
             [op.default_sampler() for op in self.operators]
         )

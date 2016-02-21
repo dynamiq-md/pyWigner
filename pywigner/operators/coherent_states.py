@@ -1,6 +1,7 @@
 from pywigner.tools import clean_ravel
 from pywigner.operators import Operator
 import pywigner as lsc
+import dynamiq_samplers as samplers
 import numpy as np
 
 def real_multidim_gaussian(x, x0, gamma):
@@ -90,10 +91,10 @@ class CoherentProjection(Operator):
         assert(len(self.gamma) == len(self.x0))
         assert(len(self.p0) == self.n_dofs)
 
-        self.gaussian_x = lsc.tools.GaussianFunction(x0=self.x0, 
-                                                     alpha=self.gamma)
-        self.gaussian_p = lsc.tools.GaussianFunction(x0=self.p0,
-                                                     alpha=self.inv_gamma)
+        self.gaussian_x = samplers.tools.GaussianFunction(x0=self.x0, 
+                                                          alpha=self.gamma)
+        self.gaussian_p = samplers.tools.GaussianFunction(x0=self.p0,
+                                                          alpha=self.inv_gamma)
 
         # This sets the total factor outside the Wigner function to 1.0,
         # since the norms of the gaussians otherwise carry. Note that we're
@@ -137,7 +138,7 @@ class CoherentProjection(Operator):
                    for i in range(len(self.gamma))]
         alpha_p = [exciton_sampling_ratios[self.excitons[i]]*self.inv_gamma[i]
                    for i in range(len(self.inv_gamma))]
-        return lsc.samplers.GaussianInitialConditions(
+        return samplers.GaussianInitialConditions(
             x0=self.x0, alpha_x=alpha_x, coordinate_dofs=self.dofs,
             p0=self.p0, alpha_p=alpha_p, momentum_dofs=self.dofs
         )
@@ -203,7 +204,7 @@ class ElectronicCoherentProjection(CoherentProjection):
                    for i in range(len(self.gamma))]
         alpha_p = [exciton_sampling_ratios[self.excitons[i]]*self.inv_gamma[i]
                    for i in range(len(self.inv_gamma))]
-        return lsc.samplers.MMSTElectronicGaussianInitialConditions(
+        return samplers.MMSTElectronicGaussianInitialConditions(
             x0=self.x0, alpha_x=alpha_x, coordinate_dofs=self.dofs,
             p0=self.p0, alpha_p=alpha_p, momentum_dofs=self.dofs
         )
