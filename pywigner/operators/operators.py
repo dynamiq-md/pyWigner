@@ -46,7 +46,7 @@ class ProductOperator(Operator):
         return result
 
     def __mul__(self, other):
-        self.operators.append(other)
+        return ProductOperator(self.operators + [other])
 
     def default_sampler(self):
         return samplers.OrthogonalInitialConditions(
