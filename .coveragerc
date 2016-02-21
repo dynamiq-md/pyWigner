@@ -4,6 +4,7 @@ omit =
     */site-packages/nose/*
     */openpathsampling/*
     */dynamiq_engine/*
+    */dynamiq_samplers/*
     */pywigner/tests/*
 exclude_lines = 
     pragma: no cover

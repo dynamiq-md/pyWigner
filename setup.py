@@ -94,12 +94,10 @@ def buildKeywordDictionary():
     setupKeywords["license"]           = "LGPL 2.1 of greater"
     setupKeywords["download_url"]      = "http://github.com/dwhswenson/pyWigner"
     setupKeywords["packages"]          = ['pywigner', 'pywigner.operators',
-                                          'pywigner.samplers',
                                           'pywigner.tests']
     setupKeywords["package_dir"]       = {
         'pywigner' : 'pywigner',
         'pywigner.operators' : 'pywigner/operators',
-        'pywigner.samplers' : 'pywigner/samplers',
         'pywigner.tests' : 'pywigner/tests'
     }
     #setupKeywords["py_modules"]        = ["pymbar", "timeseries", "testsystems", "confidenceintervals"]
