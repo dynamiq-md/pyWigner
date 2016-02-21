@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/dynamiq-md/pyWigner.svg?branch=master)](https://travis-ci.org/dynamiq-md/pyWigner)
-[![Coverage Status](https://coveralls.io/repos/github/dynamiq-md/pyWigner/badge.svg?branch=travis)](https://coveralls.io/github/dynamiq-md/pyWigner?branch=travis)
+[![Coverage Status](https://coveralls.io/repos/github/dynamiq-md/pyWigner/badge.svg)](https://coveralls.io/github/dynamiq-md/pyWigner)
 
 # pyWigner
 Python toolkit for LSC-IVR (classical Wigner) simulations, built on
