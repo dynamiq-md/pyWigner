@@ -3,14 +3,10 @@ import pywigner as lsc
 import dynamiq_engine as dynq
 import numpy as np
 from pywigner.operators import *
-
-
-from nose.tools import (
-    raises, assert_equal, assert_almost_equal, assert_not_equal
-)
-from nose.plugins.skip import SkipTest
+from pywigner.operators.coherent_states import raveled_numpyify
 import dynamiq_engine.tests as dynq_tests
 
+from pywigner.tests.tools import *
 class OperatorTester(object):
     def __init__(self):
         pot = dynq_tests.stubs.PotentialStub(n_spatial=2)
@@ -76,6 +72,22 @@ class testProductOperator(OperatorTester):
                           self.snap0.electronic_momenta):
             assert_not_equal(a,b)
 
+class test_raveled_numpyify(object):
+    def setup(self):
+        self.test_array = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
+        self.test_expected = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+
+    def test_numpy_input(self):
+        assert_array_almost_equal(
+            raveled_numpyify(np.array(self.test_array)), 
+            self.test_expected
+        )
+
+    def test_straight_input(self):
+        assert_array_almost_equal(
+            raveled_numpyify(self.test_array), 
+            self.test_expected
+        )
 
 class testCoherentProjection(OperatorTester):
     def setup(self):

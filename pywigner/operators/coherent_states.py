@@ -8,7 +8,7 @@ def raveled_numpyify(arr):
     try:
         retval = arr.ravel()
     except AttributeError:
-        retval = np.array(arr)
+        retval = np.array(arr).ravel()
     return retval
 
 class CoherentProjection(Operator):
