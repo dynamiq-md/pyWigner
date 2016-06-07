@@ -10,9 +10,14 @@ install:
 
 script:
     - conda install --yes conda-build
-    - conda build devtools/conda-recipe
+    - conda config --set always_yes true
+    # when OPS conda doesn't work, use these two lines
+    - source devtools/no-ops-conda/make_build.sh
+    - source devtools/no-ops-conda/build.sh
+    # when OPS conda works, use these two lines
+    #- conda build devtools/conda-recipe
+    #- source activate _test
     
-    - source activate _test
     - nosetests -v --with-coverage
 
 after_success:
